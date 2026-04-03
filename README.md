@@ -1,6 +1,6 @@
 # Monster Job Scraper
 
-Extract structured data from [monster.com](https://monster.com) — monster.com — one of the largest U.S. job boards with 1M+ listings. Structured salary data, remote work detection, and job change monitoring.
+Extract structured job listings from [monster.com](https://monster.com) — one of the largest U.S. job boards with over 1 million active listings across 14 countries including the US, UK, Germany, and Canada.
 
 **[Monster Job Scraper on Apify →](https://apify.com/blackfalcondata/monster-scraper)**
 
@@ -8,21 +8,28 @@ Extract structured data from [monster.com](https://monster.com) — monster.com 
 
 ## Key features
 
-**Search with filters** — Search by keyword and location. Filter by country, employment type, date posted, and more.
+**Search with filters** — Search by keyword and location. Filter by country, employment type (full-time, part-time, contract, internship, temp), and date posted (today, last week, last month).
 
-**Detail enrichment** — Fetch full job descriptions, salary data, employer profiles, direct apply URLs for each listing.
+**Structured salary data** — Extracts salary ranges (min/max/currency/period) directly from Monster's structured data — no regex parsing.
+
+**Remote work detection** — Each listing includes `isRemote` field derived from Monster's job location type (REMOTE / ONSITE / HYBRID).
 
 **Incremental mode** — Only get new or changed listings since your last run. Content hash per listing — no duplicates, no re-processing.
+
+**Multi-country support** — Scrape US, UK, DE, CA, FR, AT, NL, BE, IE, SE, ES, IT, CH, and LU job markets from a single actor.
 
 ---
 
 ## Use cases
 
 **Data pipeline automation**
-Integrate with your ETL pipeline to collect structured listings from monster.com on a schedule. Export to CSV, JSON, or directly to your database. Use compact mode to control output size.
+Collect structured job listings from monster.com on a schedule. Export to CSV, JSON, or directly to your database. Use compact mode to control output size for AI pipelines.
 
 **Market research**
-Monitor listings, track trends, and analyze market dynamics with structured, deduplicated data from monster.com.
+Monitor hiring trends, track salary ranges by role and location, and analyze demand patterns across countries with deduplicated data from Monster's full index.
+
+**Job change monitoring**
+Use incremental mode with a stable `stateKey` to track when roles are posted, updated, or expire — ideal for recruitment intelligence and competitive analysis.
 
 ---
 
@@ -31,8 +38,9 @@ Monitor listings, track trends, and analyze market dynamics with structured, ded
 ```json
 {
   "query": "software engineer",
-  "maxResults": 50,
-  "includeDetails": true
+  "location": "New York",
+  "country": "US",
+  "maxResults": 50
 }
 ```
 
@@ -54,37 +62,47 @@ Monitor listings, track trends, and analyze market dynamics with structured, ded
 | `compact` | boolean | `false` | Core fields only (for AI-agent/MCP workflows). |
 | `incrementalMode` | boolean | `false` | Compare against previous run state. |
 | `stateKey` | string | — | Stable identifier for tracked universe. |
-| `proxyConfiguration` | object | — | Optional proxy configuration. |
 
 ---
 
 ## FAQ
 
-<!-- WRITE: 4-6 Q&A pairs relevant to this product -->
-
 **Is it legal to scrape monster.com?**
-Web scraping of publicly available data is generally legal. This actor only accesses publicly visible information. Always check the target site's terms of service for your specific use case.
+Web scraping of publicly available data is generally legal. This actor only accesses publicly visible job listings. Always check the target site's terms of service for your specific use case.
 
 **How does incremental mode work?**
-Each listing gets a content hash. On subsequent runs, only new or changed listings are emitted — saving time, compute, and storage.
+Each listing gets a content hash. On subsequent runs, only new or changed listings are emitted — saving time, compute, and storage. Requires a stable `stateKey` per monitored query.
+
+**Which countries are supported?**
+US, UK (monster.co.uk), Germany (monster.de), Canada, France, Austria, Netherlands, Belgium, Ireland, Sweden, Spain, Italy, Switzerland, and Luxembourg.
+
+**What salary data is available?**
+Structured salary ranges when Monster provides them — min value, max value, currency, and pay period (hourly, annual, etc.). The `isSalaryExtracted` flag in Monster's API indicates whether salary was extracted from the description or provided directly.
+
+**Does it support remote job filtering?**
+Yes. Set `employmentType: "REMOTE"` to filter for remote listings. Additionally, the `isRemote` output field reflects Monster's own classification (REMOTE/ONSITE/HYBRID).
+
+**Can I monitor a specific employer?**
+Use keyword search with the employer name (e.g. `query: "Google"`) combined with incremental mode to track new job postings from a specific company over time.
 
 ---
 
 ## Known limitations
 
-<!-- WRITE: 4-6 honest limitations -->
-
-- <!-- WRITE: limitation 1 -->
-- <!-- WRITE: limitation 2 -->
+- Monster.com's estimated total result count (`estimatedTotalSize`) is approximate — actual results may differ slightly from the reported total.
+- Salary data is only available when Monster provides it; many listings omit salary information entirely.
+- The `skills` field is not available as structured data in Monster's API — occupational categories are broad SOC codes, not skill tags.
+- Employment type filtering may return fewer results than expected if Monster's index for that type is sparse for the given query.
 
 ---
 
 ## Related products by Black Falcon Data
 
-- [StepStone Scraper](https://github.com/BlackFalconData-org/stepstone-scraper) — Job listings from 18 European portals
 - [Indeed Job Scraper](https://github.com/BlackFalconData-org/indeed-job-scraper) — Indeed job listings with salary data
 - [Glassdoor Job Scraper](https://github.com/BlackFalconData-org/glassdoor-job-scraper) — Glassdoor listings with company ratings
+- [Reed Scraper](https://github.com/BlackFalconData-org/reed-scraper) — UK job listings from reed.co.uk
+- [Dice.com Job Scraper](https://github.com/BlackFalconData-org/dice-com-job-scraper) — US tech job listings
 
 ---
 
-*Last updated: 2026 04*
+*Last updated: 2026-04*
