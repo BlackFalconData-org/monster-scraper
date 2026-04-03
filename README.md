@@ -56,7 +56,7 @@ Use incremental mode with a stable `stateKey` to track when roles are posted, up
 | `radius` | integer | `30` | Search radius around location in miles. |
 | `employmentType` | enum | — | Filter by employment type. |
 | `datePosted` | enum | — | Filter by how recently jobs were posted. |
-| `maxResults` | integer | `25` | Maximum total results (0 = unlimited). |
+| `maxResults` | integer | `25` | Maximum total results. Up to 1,500 per run. |
 | `includeDetails` | boolean | `true` | Fetch full job details. |
 | `descriptionMaxLength` | integer | `0` | Truncate description to N chars. 0 = no truncation. |
 | `compact` | boolean | `false` | Core fields only (for AI-agent/MCP workflows). |
@@ -89,6 +89,7 @@ Use keyword search with the employer name (e.g. `query: "Google"`) combined with
 
 ## Known limitations
 
+- Maximum 1,500 results per run. Monster.com's API limits pagination depth beyond this point.
 - Monster.com's estimated total result count (`estimatedTotalSize`) is approximate — actual results may differ slightly from the reported total.
 - Salary data is only available when Monster provides it; many listings omit salary information entirely.
 - The `skills` field is not available as structured data in Monster's API — occupational categories are broad SOC codes, not skill tags.
